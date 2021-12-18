@@ -53,6 +53,10 @@ def celciusToFarenheit(tempC):
     return 9.0/5.0 * tempC + 32
 
 while True:
-    (tempC, hum, now) = getReading()
-    saveToInflux(tempC, hum, now)
+    try:
+        (tempC, hum, now) = getReading()
+        saveToInflux(tempC, hum, now)
+    except Exception as ex:
+        print("Error reading/writing:")
+        print(ex)
     time.sleep(55) # seconds
