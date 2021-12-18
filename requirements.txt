@@ -1,2 +1,3 @@
 adafruit-circuitpython-si7021==3.3.5
 influxdb-client==1.24.0
+python-dotenv==0.15.0
