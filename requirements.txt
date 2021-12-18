@@ -1,0 +1,2 @@
+adafruit-circuitpython-si7021==3.3.5
+influxdb-client==1.24.0
