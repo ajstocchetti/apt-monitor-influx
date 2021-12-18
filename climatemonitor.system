@@ -1,0 +1,10 @@
+[Unit]
+Description=Temperature and Humidity monitoring
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python /home/ajs/code/apt-monitor-influx/main.py
+
+[Install]
+WantedBy=multi-user.target
