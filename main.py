@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 import board
 import adafruit_si7021
+import adafruit_sht31d
 
 from influxdb_client import InfluxDBClient
 from influxdb_client.client.write_api import SYNCHRONOUS
@@ -17,18 +18,27 @@ influx_bucket = os.getenv('INFLUX_BUCKET', 'home-monitor-01')
 influx_org = os.getenv('INFLUX_ORG', 'home-monitor')
 device_location = os.getenv('SENSOR_LOC')
 
-# Create library object using our Bus I2C port
-si7021 = adafruit_si7021.SI7021(board.I2C())
+# initialize our sensor...
+sensor = None
+device_type = os.getenv('SENSOR_TYPE')
+if device_type == 'si7021':
+    sensor = adafruit_si7021.SI7021(board.I2C())
+elif device_type == 'sht31d':
+    sensor = sensor = adafruit_sht31d.SHT31D(board.I2C())
+# verify that sensor was initiated
+if sensor is None:
+    raise Exception(f"Invalid device type: {device_type}")
 
 
 def getReading():
     now = datetime.utcnow().isoformat()
-    return getReadingsi7021() + (now,)
+    # both si7021 and sht31d have same api
+    return getReadingsi7021() + (device_type, now)
 
 def getReadingsi7021():
-    tempC = si7021.temperature
-    humidity = si7021.relative_humidity
-    return (tempC, humidity, 'si7021')
+    tempC = sensor.temperature
+    humidity = sensor.relative_humidity
+    return (tempC, humidity)
 
 def saveToInflux(tempC, humidity, device_type, ts = datetime.utcnow().isoformat()):
     with InfluxDBClient(url=influx_addr, token=influx_token, org=influx_org) as client:
