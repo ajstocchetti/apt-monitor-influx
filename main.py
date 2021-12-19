@@ -18,21 +18,27 @@ influx_org = os.getenv('INFLUX_ORG', 'home-monitor')
 device_location = os.getenv('SENSOR_LOC')
 
 # Create library object using our Bus I2C port
-sensor = adafruit_si7021.SI7021(board.I2C())
+si7021 = adafruit_si7021.SI7021(board.I2C())
 
 
 def getReading():
     now = datetime.utcnow().isoformat()
-    tempC = sensor.temperature
-    humidity = sensor.relative_humidity
-    return (tempC, humidity, now)
+    return getReadingsi7021() + (now,)
 
-def saveToInflux(tempC, humidity, ts = datetime.utcnow().isoformat()):
+def getReadingsi7021():
+    tempC = si7021.temperature
+    humidity = si7021.relative_humidity
+    return (tempC, humidity, 'si7021')
+
+def saveToInflux(tempC, humidity, device_type, ts = datetime.utcnow().isoformat()):
     with InfluxDBClient(url=influx_addr, token=influx_token, org=influx_org) as client:
         write_api = client.write_api(write_options=SYNCHRONOUS)
         data = {
             "measurement": "interior-climate",
-            "tags": { "location": device_location },
+            "tags": {
+                "location": device_location,
+                "sensor": device_type,
+            },
             "time": ts,
             "fields": {
                 "tempF": celciusToFarenheit(tempC),
@@ -44,7 +50,7 @@ def saveToInflux(tempC, humidity, ts = datetime.utcnow().isoformat()):
         print('wrote data to influx...')
 
 def printReadings(readings):
-    (tempC, hum, now) = readings
+    (tempC, hum) = readings
     tempF = celciusToFarenheit(tempC)
     print("\nTemperature: %0.1f F [%0.1f C]" % (tempF, tempC))
     print("Humidity: %0.1f %%" % hum)
@@ -54,8 +60,8 @@ def celciusToFarenheit(tempC):
 
 while True:
     try:
-        (tempC, hum, now) = getReading()
-        saveToInflux(tempC, hum, now)
+        (tempC, hum, device_type, now) = getReading()
+        saveToInflux(tempC, hum, device_type, now)
     except Exception as ex:
         print("Error reading/writing:")
         print(ex)
