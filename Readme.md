@@ -10,7 +10,7 @@ sudo python3 raspi-blinka.py
 
 # Setup as service
 ```bash
-sudo cp climatemonitor.service /lib/systemd/system
+sudo cp sensors/climatemonitor.service /lib/systemd/system
 sudo chmod 644 /lib/systemd/system/climatemonitor.service
 sudo systemctl daemon-reload
 sudo systemctl enable climatemonitor.service

@@ -1,5 +1,4 @@
 import os
-import time
 from datetime import datetime
 from dotenv import load_dotenv
 
@@ -29,6 +28,14 @@ elif device_type == 'sht31d':
 if sensor is None:
     raise Exception(f"Invalid device type: {device_type}")
 
+
+def readAndSave():
+    try:
+        (tempC, hum, device_type, now) = getReading()
+        saveToInflux(tempC, hum, device_type, now)
+    except Exception as ex:
+        print("Error reading/writing:")
+        print(ex)
 
 def getReading():
     now = datetime.utcnow().isoformat()
@@ -67,12 +74,3 @@ def printReadings(readings):
 
 def celciusToFarenheit(tempC):
     return 9.0/5.0 * tempC + 32
-
-while True:
-    try:
-        (tempC, hum, device_type, now) = getReading()
-        saveToInflux(tempC, hum, device_type, now)
-    except Exception as ex:
-        print("Error reading/writing:")
-        print(ex)
-    time.sleep(55) # seconds
