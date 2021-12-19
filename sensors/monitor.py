@@ -18,6 +18,7 @@ influx_org = os.getenv('INFLUX_ORG', 'home-monitor')
 device_location = os.getenv('SENSOR_LOC')
 
 # initialize our sensor...
+# TODO: put this in an initialization function
 sensor = None
 device_type = os.getenv('SENSOR_TYPE')
 if device_type == 'si7021':
@@ -74,3 +75,6 @@ def printReadings(readings):
 
 def celciusToFarenheit(tempC):
     return 9.0/5.0 * tempC + 32
+
+if __name__ == "__main__":
+    readAndSave()
