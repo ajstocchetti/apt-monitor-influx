@@ -11,7 +11,7 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 
 
 load_dotenv()
-influx_addr = os.getenv('INFLUX_ADDR', '192.168.1.5:8086')
+influx_addr = os.getenv('INFLUX_ADDR', '192.168.1.194:8086')
 influx_token = os.getenv('INFLUX_TOKEN')
 influx_bucket = os.getenv('INFLUX_BUCKET', 'home-monitor-01')
 influx_org = os.getenv('INFLUX_ORG', 'home-monitor')
